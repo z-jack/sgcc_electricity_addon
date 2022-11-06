@@ -60,7 +60,7 @@ class DataFetcher:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--disable-dev-shm-usage') 
-        driver = uc.Chrome(options = chrome_options, version_main = self._chromium_version)
+        driver = uc.Chrome(driver_executable_path = "/usr/bin/chromedriver" ,options = chrome_options, version_main = self._chromium_version)
         driver.implicitly_wait(DRIVER_IMPLICITY_WAIT_TIME)
         return driver
 
