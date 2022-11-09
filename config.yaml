@@ -1,5 +1,5 @@
 name: "sgcc_electricity"
-version: "1.0"
+version: "1.1"
 slug: sgcc_electricity
 description: "Make sgcc electricity data available in HA"
 arch:

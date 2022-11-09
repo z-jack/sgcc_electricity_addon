@@ -42,13 +42,14 @@ class DataFetcher:
         try:
             self._login(driver)
             logging.info(f"Login successfully on {LOGIN_URL}" )
-            balance = self._get_eletric_balance(driver)
-            logging.info(f"Get electricity charge balance successfully, balance is {balance} CNY.")
-            usage = self._get_yesterday_usage(driver)
-            logging.info(f"Get yesterday power consumption successfully, usage is {usage} kwh.")
+            user_id_list = self._get_user_ids(driver)
+            balance_list = self._get_electric_balances(driver, user_id_list)
+            last_daily_usage_list, yearly_charge_list, yearly_usage_list = self._get_other_data(driver, user_id_list)       
             driver.quit()
             logging.debug("Webdriver quit after fetching data successfully.")
-            return balance, usage
+
+            return user_id_list, balance_list, last_daily_usage_list, yearly_charge_list, yearly_usage_list
+
         finally:
                 driver.quit()  
 
@@ -82,13 +83,16 @@ class DataFetcher:
 
             if(not self._is_captcha_legal(orc_result)):
                 logging.debug(f"The captcha is illegal, which is caused by ddddocr, {RETRY_TIMES_LIMIT - retry_times} retry times left.")
+                WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(captcha_element))
                 captcha_element.click()
                 time.sleep(2)
                 continue
 
             input_elements[2].send_keys(orc_result)
 
-            driver.find_element(By.CLASS_NAME, "el-button.el-button--primary").click()
+            login_button = driver.find_element(By.CLASS_NAME, "el-button.el-button--primary")
+            WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(login_button))
+            login_button.click()
             try:
                 return WebDriverWait(driver,LOGIN_EXPECTED_TIME).until(EC.url_changes(LOGIN_URL))
             except:
@@ -96,20 +100,86 @@ class DataFetcher:
 
         raise Exception("Login failed, please check your phone number and password!!!")
 
-    def _get_eletric_balance(self, driver):
-        driver.find_element(By.XPATH,"//li[@class='inline_block_fix zhanghu-full']//b[@class='cff8']")
-        time.sleep(5)
-        for retry_times in range(0, RETRY_TIMES_LIMIT):
-            electric_balance = driver.find_element(By.XPATH,"//li[@class='inline_block_fix zhanghu-full']//b[@class='cff8']").text
-            if(not electric_balance.startswith("-")):
-                break
-            time.sleep(1)
-        return float(electric_balance.replace("元",""))
+    def _get_electric_balances(self, driver, user_id_list):
+        balance_list = []
+        driver.get(BALANCE_URL)
+        for i in range(1, len(user_id_list) + 1):
+            balance = self._get_eletric_balance(driver)
+            logging.info(f"Get electricity charge balance for {user_id_list[i-1]} successfully, balance is {balance} CNY.")
+            balance_list.append(balance)
+
+            if(i != len(user_id_list)):
+                roll_down_button = driver.find_element(By.CLASS_NAME, "el-input__inner")
+                WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(roll_down_button))
+                roll_down_button.click()
+                next_one = driver.find_element(By.XPATH, f"//ul[@class='el-scrollbar__view el-select-dropdown__list']/li[{i + 1}]")
+                WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(next_one))
+                next_one.click()
+        return balance_list
     
-    def _get_yesterday_usage(self, driver):
+    def _get_other_data(self, driver, user_id_list):
+        last_daily_usage_list =[]
+        yearly_usage_list = []
+        yearly_charge_list = []
         driver.get(ELECTRIC_USAGE_URL)
-        driver.find_element(By.XPATH,"//div[@class='el-tabs__nav is-top']/div[@id='tab-second']").click()
-        usage = driver.find_element(By.XPATH,"//div[@class='el-table__body-wrapper is-scrolling-none']//td[@class='el-table_2_column_6  ']/div").text
+        for i in range(1, len(user_id_list) + 1):
+
+            yearly_usage, yearly_charge = self._get_yearly_data(driver)
+            logging.info(f"Get last year power consumption for {user_id_list[i-1]} successfully, usage is {yearly_usage} kwh, yealrly charge is {yearly_charge} CNY")
+
+            last_daily_usage = self._get_yesterday_usage(driver)
+            logging.info(f"Get last daily power consumption for {user_id_list[i-1]} successfully, usage is {last_daily_usage} kwh.")
+
+            last_daily_usage_list.append(last_daily_usage)
+            yearly_charge_list.append(yearly_charge)
+            yearly_usage_list.append(yearly_usage)
+
+            if(i != len(user_id_list)):
+                click_element = driver.find_element(By.CLASS_NAME, "el-input.el-input--suffix")
+                WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element))
+                click_element.click()
+                click_element2 =  driver.find_element(By.XPATH, f"//body/div[@class='el-select-dropdown el-popper']//ul[@class='el-scrollbar__view el-select-dropdown__list']/li[{i + 1}]")
+                WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element2))
+                click_element2.click()
+            
+        return last_daily_usage_list, yearly_charge_list, yearly_usage_list
+
+    @staticmethod
+    def _get_user_ids(driver):
+        roll_down_button = driver.find_element(By.XPATH, "//div[@class='el-dropdown']/span")
+        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(roll_down_button))
+        roll_down_button.click()
+        target = driver.find_element(By.CLASS_NAME, "el-dropdown-menu.el-popper").find_element(By.TAG_NAME, "li")
+        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.visibility_of(target))
+        userid_elements = driver.find_element(By.CLASS_NAME, "el-dropdown-menu.el-popper").find_elements(By.TAG_NAME, "li")
+        userid_list = []
+        for element in userid_elements:
+            userid_list.append(re.findall("[0-9]+", element.text)[-1])
+        return userid_list
+
+    def _get_eletric_balance(self, driver):
+        balance = driver.find_element(By.CLASS_NAME,"num").text
+        return float(balance)
+    
+    def _get_yearly_data(self, driver):
+        click_element = driver.find_element(By.XPATH, "//div[@class='el-tabs__nav is-top']/div[@id='tab-first']")
+        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element))
+
+        click_element.click()
+        target = driver.find_element(By.CLASS_NAME, "total")
+        
+        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.visibility_of(target))
+        yearly_usage = driver.find_element(By.XPATH, "//ul[@class='total']/li[1]/span").text
+        yearly_charge = driver.find_element(By.XPATH, "//ul[@class='total']/li[2]/span").text
+        return yearly_usage, yearly_charge
+
+        
+
+    def _get_yesterday_usage(self, driver):
+        click_element = driver.find_element(By.XPATH,"//div[@class='el-tabs__nav is-top']/div[@id='tab-second']")
+        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element))
+        click_element.click()
+        usage = driver.find_element(By.XPATH,"//div[@class='el-table__body-wrapper is-scrolling-none']//td[2]/div").text
         return(float(usage))
 
     @staticmethod
@@ -125,3 +195,7 @@ class DataFetcher:
     def _get_chromium_version():
         result = str(subprocess.check_output(["chromium", "--product-version"]))
         return re.findall(r"(\d*)\.",result)[0]
+
+if(__name__ == "__main__"):
+    fetcher = DataFetcher("18622517008","Lzr519812")
+    print(fetcher.fetch())
