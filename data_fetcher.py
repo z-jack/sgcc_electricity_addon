@@ -84,7 +84,7 @@ class DataFetcher:
             if(not self._is_captcha_legal(orc_result)):
                 logging.debug(f"The captcha is illegal, which is caused by ddddocr, {RETRY_TIMES_LIMIT - retry_times} retry times left.")
                 WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(captcha_element))
-                captcha_element.click()
+                driver.execute_script("arguments[0].click();", captcha_element)
                 time.sleep(2)
                 continue
 
@@ -92,7 +92,7 @@ class DataFetcher:
 
             login_button = driver.find_element(By.CLASS_NAME, "el-button.el-button--primary")
             WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(login_button))
-            login_button.click()
+            driver.execute_script("arguments[0].click();", login_button)
             try:
                 return WebDriverWait(driver,LOGIN_EXPECTED_TIME).until(EC.url_changes(LOGIN_URL))
             except:
@@ -125,10 +125,10 @@ class DataFetcher:
         for i in range(1, len(user_id_list) + 1):
 
             yearly_usage, yearly_charge = self._get_yearly_data(driver)
-            logging.info(f"Get last year power consumption for {user_id_list[i-1]} successfully, usage is {yearly_usage} kwh, yealrly charge is {yearly_charge} CNY")
+            logging.info(f"Get year power consumption for {user_id_list[i-1]} successfully, usage is {yearly_usage} kwh, yealrly charge is {yearly_charge} CNY")
 
             last_daily_usage = self._get_yesterday_usage(driver)
-            logging.info(f"Get last daily power consumption for {user_id_list[i-1]} successfully, usage is {last_daily_usage} kwh.")
+            logging.info(f"Get daily power consumption for {user_id_list[i-1]} successfully, usage is {last_daily_usage} kwh.")
 
             last_daily_usage_list.append(last_daily_usage)
             yearly_charge_list.append(yearly_charge)
@@ -137,10 +137,10 @@ class DataFetcher:
             if(i != len(user_id_list)):
                 click_element = driver.find_element(By.CLASS_NAME, "el-input.el-input--suffix")
                 WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element))
-                click_element.click()
+                driver.execute_script("arguments[0].click();", click_element)
                 click_element2 =  driver.find_element(By.XPATH, f"//body/div[@class='el-select-dropdown el-popper']//ul[@class='el-scrollbar__view el-select-dropdown__list']/li[{i + 1}]")
                 WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element2))
-                click_element2.click()
+                driver.execute_script("arguments[0].click();", click_element2)
             
         return last_daily_usage_list, yearly_charge_list, yearly_usage_list
 
@@ -148,7 +148,7 @@ class DataFetcher:
     def _get_user_ids(driver):
         roll_down_button = driver.find_element(By.XPATH, "//div[@class='el-dropdown']/span")
         WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(roll_down_button))
-        roll_down_button.click()
+        driver.execute_script("arguments[0].click();", roll_down_button)
         target = driver.find_element(By.CLASS_NAME, "el-dropdown-menu.el-popper").find_element(By.TAG_NAME, "li")
         WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.visibility_of(target))
         userid_elements = driver.find_element(By.CLASS_NAME, "el-dropdown-menu.el-popper").find_elements(By.TAG_NAME, "li")
@@ -164,8 +164,7 @@ class DataFetcher:
     def _get_yearly_data(self, driver):
         click_element = driver.find_element(By.XPATH, "//div[@class='el-tabs__nav is-top']/div[@id='tab-first']")
         WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element))
-
-        click_element.click()
+        driver.execute_script("arguments[0].click();", click_element)
         target = driver.find_element(By.CLASS_NAME, "total")
         
         WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.visibility_of(target))
@@ -178,7 +177,7 @@ class DataFetcher:
     def _get_yesterday_usage(self, driver):
         click_element = driver.find_element(By.XPATH,"//div[@class='el-tabs__nav is-top']/div[@id='tab-second']")
         WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element))
-        click_element.click()
+        driver.execute_script("arguments[0].click();", click_element)
         usage = driver.find_element(By.XPATH,"//div[@class='el-table__body-wrapper is-scrolling-none']//td[2]/div").text
         return(float(usage))
 

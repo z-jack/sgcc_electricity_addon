@@ -1,13 +1,15 @@
 # sgcc_electricity
 
 
-## 1.1 更新日志
+### 1.1 更新日志
 
-1.适配多个户号
+1.适配多个户号（多个户号相关的UI配置（如需），见使用说明第一部分）
 
 2.增加查看年用电量、消费量
 
 3.优化部分已经bug
+
+## 使用说明
 
 本应用可以帮助你将国网的电费、用电量数据接入HA，适用于除南方电网覆盖省份外的用户。即除广东、广西、云南、贵州、海南等省份的用户外，均可使用本应用获取电力、电费数据。
 
@@ -77,11 +79,11 @@ template:
       - platform: event
         event_type: "state_changed"
         event_data: 
-          entity_id: sensor.electricity_charge_balance_{户号} 
+          entity_id: sensor.electricity_charge_balance_户号
     sensor:
-      - name: electricity_charge_balance_{户号}_entity
-        unique_id: electricity_charge_balance_{户号}_entity
-        state: "{{ states('sensor.electricity_charge_balance_{户号}') }}"
+      - name: electricity_charge_balance_户号_entity
+        unique_id: electricity_charge_balance_户号_entity
+        state: "{{ states('sensor.electricity_charge_balance_户号') }}"
         state_class: measurement
         unit_of_measurement: "CNY"
  
@@ -89,11 +91,11 @@ template:
       - platform: event
         event_type: "state_changed"
         event_data: 
-          entity_id: sensor.last_electricity_usage_{户号}
+          entity_id: sensor.last_electricity_usage_户号
     sensor:
-      - name: last_electricity_usage_{户号}_entity
-        unique_id: last_electricity_usage_{户号}_entity
-        state: "{{ states('sensor.last_electricity_usage_{户号}') }}"
+      - name: last_electricity_usage_户号_entity
+        unique_id: last_electricity_usage_户号_entity
+        state: "{{ states('sensor.last_electricity_usage_户号') }}"
         state_class: measurement
         unit_of_measurement: "KWH"
 
@@ -101,11 +103,11 @@ template:
       - platform: event
         event_type: "state_changed"
         event_data: 
-          entity_id: sensor.yearly_electricity_usage_{户号}
+          entity_id: sensor.yearly_electricity_usage_户号
     sensor:
-      - name: yearly_electricity_usage_{户号}_entity
-        unique_id: yearly_electricity_usage_{户号}_entity
-        state: "{{ states('sensor.yearly_electricity_usage_{户号}') }}"
+      - name: yearly_electricity_usage_户号_entity
+        unique_id: yearly_electricity_usage_户号_entity
+        state: "{{ states('sensor.yearly_electricity_usage_户号') }}"
         state_class: measurement
         unit_of_measurement: "KWH"
   
@@ -113,11 +115,11 @@ template:
       - platform: event
         event_type: "state_changed"
         event_data: 
-          entity_id: sensor.yearly_electricity_charge_{户号}
+          entity_id: sensor.yearly_electricity_charge_户号
     sensor:
-      - name: yearly_electricity_charge_{户号}_entity
-        unique_id: yearly_electricity_charge_{户号}_entity
-        state: "{{ states('sensor.yearly_electricity_{户号}_charge') }}"
+      - name: yearly_electricity_charge_户号_entity
+        unique_id: yearly_electricity_charge_户号_entity
+        state: "{{ states('sensor.yearly_electricity_charge_户号') }}"
         state_class: measurement
         unit_of_measurement: "CNY"
 ```
