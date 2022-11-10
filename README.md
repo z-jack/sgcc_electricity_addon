@@ -57,7 +57,7 @@ sensor.yearly_electricity_usage： 今年以来用电量
 sensor.yearly_electricity_charge: 今年以来电费
 ```
 
-__注：如果你有一个户号，在HA里就是以上实体名；如果你有多个户号，实体名称还要加 “_户号”后缀，举例:sensor.last_electricity_usage_1234567890__
+__注：如果你有一个户号，在HA里就是以上实体名；如果你有多个户号，实体名称还要加 “\_户号”后缀，举例:sensor.last_electricity_usage_1234567890__
 
 
 由于采用REST API方式创建sensor，没有做实体注册，无法在webui里编辑。如果需要，你可以在configuration.yaml下增加如下配置后重启HA，这样你就可在webUI编辑对应的实体了。
