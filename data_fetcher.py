@@ -98,7 +98,7 @@ class DataFetcher:
             except:
                 logging.debug(f"Login failed, maybe caused by invalid captcha, {RETRY_TIMES_LIMIT - retry_times} retry times left.")
 
-        raise Exception("Login failed, please check your phone number and password!!!")
+        raise Exception("Login failed, maybe caused by incorrect phone_number and password")
 
     def _get_electric_balances(self, driver, user_id_list):
         balance_list = []
@@ -151,6 +151,7 @@ class DataFetcher:
         driver.execute_script("arguments[0].click();", roll_down_button)
         target = driver.find_element(By.CLASS_NAME, "el-dropdown-menu.el-popper").find_element(By.TAG_NAME, "li")
         WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.visibility_of(target))
+        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.text_to_be_present_in_element((By.XPATH, "//ul[@class='el-dropdown-menu el-popper']/li"), ":"))
         userid_elements = driver.find_element(By.CLASS_NAME, "el-dropdown-menu.el-popper").find_elements(By.TAG_NAME, "li")
         userid_list = []
         for element in userid_elements:
@@ -178,8 +179,9 @@ class DataFetcher:
         click_element = driver.find_element(By.XPATH,"//div[@class='el-tabs__nav is-top']/div[@id='tab-second']")
         WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.element_to_be_clickable(click_element))
         driver.execute_script("arguments[0].click();", click_element)
-        usage = driver.find_element(By.XPATH,"//div[@class='el-table__body-wrapper is-scrolling-none']//td[2]/div").text
-        return(float(usage))
+        usage_element = driver.find_element(By.XPATH,"//div[@class='el-tab-pane dayd']//div[@class='el-table__body-wrapper is-scrolling-none']/table/tbody/tr[1]/td[2]/div")
+        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME). until(EC.visibility_of(usage_element))
+        return(float(usage_element.text))
 
     @staticmethod
     def _is_captcha_legal(captcha):
