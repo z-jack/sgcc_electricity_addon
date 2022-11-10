@@ -1,4 +1,4 @@
-import undetected_chromedriver as uc
+Oimport undetected_chromedriver as uc
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -9,6 +9,7 @@ import logging
 import traceback
 import subprocess
 import re
+import sys
 from const import *
 
 
@@ -98,7 +99,7 @@ class DataFetcher:
             except:
                 logging.debug(f"Login failed, maybe caused by invalid captcha, {RETRY_TIMES_LIMIT - retry_times} retry times left.")
 
-        raise Exception("Login failed, maybe caused by incorrect phone_number and password")
+        raise Exception("Login failed, try again, maybe caused by incorrect phone_number and password")
 
     def _get_electric_balances(self, driver, user_id_list):
         balance_list = []
@@ -198,5 +199,15 @@ class DataFetcher:
         return re.findall(r"(\d*)\.",result)[0]
 
 if(__name__ == "__main__"):
-    fetcher = DataFetcher("18622517008","Lzr519812")
+    '''You can test it in the docker container. Replace the following params and use 'python3 data_fetcher.py' '''
+
+    logger = logging.getLogger()
+    logger.setLevel("INFO")
+    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
+    format = logging.Formatter("%(asctime)s  [%(levelname)-8s] ---- %(message)s","%Y-%m-%d %H:%M:%S")
+    sh = logging.StreamHandler(stream=sys.stdout) 
+    sh.setFormatter(format)
+    logger.addHandler(sh)
+    
+    fetcher = DataFetcher("phoneNumber","password")
     print(fetcher.fetch())
