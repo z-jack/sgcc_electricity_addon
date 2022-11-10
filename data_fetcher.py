@@ -238,5 +238,5 @@ if(__name__ == "__main__"):
     sh.setFormatter(format)
     logger.addHandler(sh)
     
-    fetcher = DataFetcher("15502256096","Lzr519812")
+    fetcher = DataFetcher("CHNAGE_ME_PHONE_NUMBER","CHANGE_ME_PASSWORD")
     print(fetcher.fetch())
