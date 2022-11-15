@@ -112,7 +112,7 @@ class DataFetcher:
             except:
                 logging.debug(f"Login failed, maybe caused by invalid captcha, {RETRY_TIMES_LIMIT - retry_times} retry times left.")
 
-        raise Exception("Login failed, maybe caused by incorrect phone_number and password")
+        raise Exception("Login failed, maybe caused by 1.incorrect phone_number and password (please double check) or 2. network (please mnodify LOGIN_EXPECTED_TIME in const.py and rebuild)")
 
     def _get_electric_balances(self, driver, user_id_list):
 
