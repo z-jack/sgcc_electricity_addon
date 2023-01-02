@@ -124,7 +124,10 @@ class DataFetcher:
         # get electricity charge balance for each user id
         for i in range(1, len(user_id_list) + 1):
             balance = self._get_eletric_balance(driver)
-            logging.info(f"Get electricity charge balance for {user_id_list[i-1]} successfully, balance is {balance} CNY.")
+            if(balance is None):
+                logging.info(f"Get electricity charge balance for {user_id_list[i-1]} failed, Pass.")
+            else:
+                logging.info(f"Get electricity charge balance for {user_id_list[i-1]} successfully, balance is {balance} CNY.")
             balance_list.append(balance)
             
             # swtich to next userid
@@ -147,10 +150,22 @@ class DataFetcher:
         for i in range(1, len(user_id_list) + 1):
 
             yearly_usage, yearly_charge = self._get_yearly_data(driver)
-            logging.info(f"Get year power consumption for {user_id_list[i-1]} successfully, usage is {yearly_usage} kwh, yealrly charge is {yearly_charge} CNY")
+
+            if(yearly_usage is None):
+                logging.error(f"Get year power usage for {user_id_list[i-1]} failed, pass")
+            else:
+                logging.info(f"Get year power usage for {user_id_list[i-1]} successfully, usage is {yearly_usage} kwh")
+            if(yearly_charge is None):
+                logging.error(f"Get year power charge for {user_id_list[i-1]} failed, pass")
+            else:
+                logging.info(f"Get year power charge for {user_id_list[i-1]} successfully, yealrly charge is {yearly_charge} CNY")
 
             last_daily_usage = self._get_yesterday_usage(driver)
-            logging.info(f"Get daily power consumption for {user_id_list[i-1]} successfully, usage is {last_daily_usage} kwh.")
+
+            if(last_daily_usage is None):
+                logging.error(f"Get daily power consumption for {user_id_list[i-1]} failed, pass")
+            else:
+                logging.info(f"Get daily power consumption for {user_id_list[i-1]} successfully, usage is {last_daily_usage} kwh.")
 
             last_daily_usage_list.append(last_daily_usage)
             yearly_charge_list.append(yearly_charge)
@@ -180,30 +195,49 @@ class DataFetcher:
         return userid_list
 
     def _get_eletric_balance(self, driver):
-        balance = driver.find_element(By.CLASS_NAME,"num").text
-        return float(balance)
+        try:
+            balance = driver.find_element(By.CLASS_NAME,"num").text
+            return float(balance)
+        except:
+            return None
+            
     
     def _get_yearly_data(self, driver):
 
-        self._click_button(driver, By.XPATH, "//div[@class='el-tabs__nav is-top']/div[@id='tab-first']")
+        try:    
+            self._click_button(driver, By.XPATH, "//div[@class='el-tabs__nav is-top']/div[@id='tab-first']")
 
         # wait for data displayed
-        target = driver.find_element(By.CLASS_NAME, "total")
-        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.visibility_of(target))
+            target = driver.find_element(By.CLASS_NAME, "total")
+            WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME).until(EC.visibility_of(target))
+        except:
+            return None, None
 
         # get data
-        yearly_usage = driver.find_element(By.XPATH, "//ul[@class='total']/li[1]/span").text
-        yearly_charge = driver.find_element(By.XPATH, "//ul[@class='total']/li[2]/span").text
+        try:
+            yearly_usage = driver.find_element(By.XPATH, "//ul[@class='total']/li[1]/span").text
+
+        except:
+            yearly_usage = None
+
+        try:
+            yearly_charge = driver.find_element(By.XPATH, "//ul[@class='total']/li[2]/span").text
+        except:
+            yearly_charge = None
+            
         return yearly_usage, yearly_charge
 
         
 
     def _get_yesterday_usage(self, driver):
-        self._click_button(driver, By.XPATH,"//div[@class='el-tabs__nav is-top']/div[@id='tab-second']")
+        try:
+            self._click_button(driver, By.XPATH,"//div[@class='el-tabs__nav is-top']/div[@id='tab-second']")
         # wait for data displayed
-        usage_element = driver.find_element(By.XPATH,"//div[@class='el-tab-pane dayd']//div[@class='el-table__body-wrapper is-scrolling-none']/table/tbody/tr[1]/td[2]/div")
-        WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME). until(EC.visibility_of(usage_element))
-        return(float(usage_element.text))
+            usage_element = driver.find_element(By.XPATH,"//div[@class='el-tab-pane dayd']//div[@class='el-table__body-wrapper is-scrolling-none']/table/tbody/tr[1]/td[2]/div")
+            WebDriverWait(driver, DRIVER_IMPLICITY_WAIT_TIME). until(EC.visibility_of(usage_element))
+            return(float(usage_element.text))
+        except:
+            return None
 
     @staticmethod
     def _click_button(driver, button_search_type, button_search_key):
