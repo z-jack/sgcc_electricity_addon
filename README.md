@@ -25,50 +25,54 @@ template:
   - trigger:
       - platform: event
         event_type: "state_changed"
-        event_data: 
-          entity_id: sensor.electricity_charge_balance 
+        event_data:
+          entity_id: sensor.electricity_charge_balance
     sensor:
       - name: electricity_charge_balance_entity
         unique_id: electricity_charge_balance_entity
         state: "{{ states('sensor.electricity_charge_balance') }}"
         state_class: measurement
         unit_of_measurement: "CNY"
- 
+        device_class: monetary
+
   - trigger:
       - platform: event
         event_type: "state_changed"
-        event_data: 
+        event_data:
           entity_id: sensor.last_electricity_usage
     sensor:
       - name: last_electricity_usage_entity
         unique_id: last_electricity_usage_entity
         state: "{{ states('sensor.last_electricity_usage') }}"
-        state_class: measurement
-        unit_of_measurement: "KWH"
+        state_class: total_increasing
+        unit_of_measurement: "kWh"
+        device_class: energy
 
   - trigger:
       - platform: event
         event_type: "state_changed"
-        event_data: 
+        event_data:
           entity_id: sensor.yearly_electricity_usage
     sensor:
       - name: yearly_electricity_usage_entity
         unique_id: yearly_electricity_usage_entity
         state: "{{ states('sensor.yearly_electricity_usage') }}"
-        state_class: measurement
-        unit_of_measurement: "KWH"
-  
+        state_class: total_increasing
+        unit_of_measurement: "kWh"
+        device_class: energy
+
   - trigger:
       - platform: event
         event_type: "state_changed"
-        event_data: 
+        event_data:
           entity_id: sensor.yearly_electricity_charge
     sensor:
       - name: yearly_electricity_charge_entity
         unique_id: yearly_electricity_charge_entity
         state: "{{ states('sensor.yearly_electricity_charge') }}"
-        state_class: measurement
+        state_class: total_increasing
         unit_of_measurement: "CNY"
+        device_class: monetary
 ```
 
 如果你有多个户号，每个户号参照以下配置
@@ -78,7 +82,7 @@ template:
   - trigger:
       - platform: event
         event_type: "state_changed"
-        event_data: 
+        event_data:
           entity_id: sensor.electricity_charge_balance_户号
     sensor:
       - name: electricity_charge_balance_户号_entity
@@ -86,42 +90,46 @@ template:
         state: "{{ states('sensor.electricity_charge_balance_户号') }}"
         state_class: measurement
         unit_of_measurement: "CNY"
- 
+        device_class: monetary
+
   - trigger:
       - platform: event
         event_type: "state_changed"
-        event_data: 
+        event_data:
           entity_id: sensor.last_electricity_usage_户号
     sensor:
       - name: last_electricity_usage_户号_entity
         unique_id: last_electricity_usage_户号_entity
         state: "{{ states('sensor.last_electricity_usage_户号') }}"
-        state_class: measurement
-        unit_of_measurement: "KWH"
+        state_class: total_increasing
+        unit_of_measurement: "kWh"
+        device_class: energy
 
   - trigger:
       - platform: event
         event_type: "state_changed"
-        event_data: 
+        event_data:
           entity_id: sensor.yearly_electricity_usage_户号
     sensor:
       - name: yearly_electricity_usage_户号_entity
         unique_id: yearly_electricity_usage_户号_entity
         state: "{{ states('sensor.yearly_electricity_usage_户号') }}"
-        state_class: measurement
-        unit_of_measurement: "KWH"
-  
+        state_class: total_increasing
+        unit_of_measurement: "kWh"
+        device_class: energy
+
   - trigger:
       - platform: event
         event_type: "state_changed"
-        event_data: 
+        event_data:
           entity_id: sensor.yearly_electricity_charge_户号
     sensor:
       - name: yearly_electricity_charge_户号_entity
         unique_id: yearly_electricity_charge_户号_entity
         state: "{{ states('sensor.yearly_electricity_charge_户号') }}"
-        state_class: measurement
+        state_class: total_increasing
         unit_of_measurement: "CNY"
+        device_class: monetary
 ```
 
 

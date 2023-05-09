@@ -10,7 +10,7 @@ DAILY_USAGE_SENSOR_NAME = "sensor.last_electricity_usage"
 YEARLY_USAGE_SENSOR_NAME = "sensor.yearly_electricity_usage"
 YEARLY_CHARGE_SENESOR_NAME = "sensor.yearly_electricity_charge"
 BALANCE_UNIT = "CNY"
-USAGE_UNIT = "KWH"
+USAGE_UNIT = "kWh"
 
 JOB_INTERVAL_HOURS = 12  # Please DO NOT make it too frequently.
 DRIVER_IMPLICITY_WAIT_TIME = 20
