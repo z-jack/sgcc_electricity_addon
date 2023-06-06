@@ -3,11 +3,12 @@
 
 本应用可以帮助你将国网的电费、用电量数据接入HA，适用于除南方电网覆盖省份外的用户。即除广东、广西、云南、贵州、海南等省份的用户外，均可使用本应用获取电力、电费数据。
 
-本应用每12小时抓取一次数据，并在HA里更新以下四个实体
+本应用每1小时抓取一次数据，并在HA里更新以下五个实体
 
 ```
 sensor.last_electricity_usage：最近一天用电量
 sensor.electricity_charge_balance：电费余额
+sensor.electricity_charge_debt：电费欠费额度
 sensor.yearly_electricity_usage： 今年以来用电量
 sensor.yearly_electricity_charge: 今年以来电费
 ```

@@ -13,7 +13,7 @@ YEARLY_CHARGE_SENESOR_NAME = "sensor.yearly_electricity_charge"
 BALANCE_UNIT = "CNY"
 USAGE_UNIT = "kWh"
 
-JOB_INTERVAL_HOURS = 12  # Please DO NOT make it too frequently.
+JOB_INTERVAL_HOURS = 1  # Please DO NOT make it too frequently.
 DRIVER_IMPLICITY_WAIT_TIME = 20
 RETRY_TIMES_LIMIT = 5
 LOGIN_EXPECTED_TIME = 10
