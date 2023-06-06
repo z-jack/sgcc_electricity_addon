@@ -9,6 +9,7 @@ import schedule
 import time
 import re
 
+
 def main():
     args = argvs_parsor()
     logger_init(args["log_level"])
@@ -22,20 +23,27 @@ def main():
         schedule.run_pending()
         time.sleep(1)
 
+
 def run_task(data_fetcher: DataFetcher, sensor_updator: SensorUpdator):
     try:
         user_id_list, balance_list, last_daily_usage_list, yearly_charge_list, yearly_usage_list = data_fetcher.fetch()
-        
+
         for i in range(0, len(user_id_list)):
             profix = f"_{user_id_list[i]}" if len(user_id_list) > 1 else ""
             if(balance_list[i] is not None):
-                sensor_updator.update(BALANCE_SENSOR_NAME + profix, abs(float(balance_list[i])), BALANCE_UNIT, 'total_increasing')
+                sensor_updator.update(DEBT_SENSOR_NAME + profix, abs(float(balance_list[i])) if float(
+                    balance_list[i]) < 0 else 0, BALANCE_UNIT, 'total_increasing')
+                sensor_updator.update(
+                    BALANCE_SENSOR_NAME + profix, balance_list[i], BALANCE_UNIT, 'total')
             if(last_daily_usage_list[i] is not None):
-                sensor_updator.update(DAILY_USAGE_SENSOR_NAME + profix, last_daily_usage_list[i], USAGE_UNIT, 'total_increasing')
+                sensor_updator.update(DAILY_USAGE_SENSOR_NAME + profix,
+                                      last_daily_usage_list[i], USAGE_UNIT, 'total_increasing')
             if(yearly_usage_list[i] is not None):
-                sensor_updator.update(YEARLY_USAGE_SENSOR_NAME + profix, yearly_usage_list[i], USAGE_UNIT, 'total_increasing')
+                sensor_updator.update(YEARLY_USAGE_SENSOR_NAME + profix,
+                                      yearly_usage_list[i], USAGE_UNIT, 'total_increasing')
             if(yearly_charge_list[i] is not None):
-                sensor_updator.update(YEARLY_CHARGE_SENESOR_NAME + profix, yearly_charge_list[i], BALANCE_UNIT, 'total_increasing')
+                sensor_updator.update(YEARLY_CHARGE_SENESOR_NAME + profix,
+                                      yearly_charge_list[i], BALANCE_UNIT, 'total_increasing')
 
         logging.info("state-refresh task run successfully!")
     except Exception as e:
@@ -45,16 +53,16 @@ def run_task(data_fetcher: DataFetcher, sensor_updator: SensorUpdator):
 
 def argvs_parsor():
     args = {
-    "phone_number": "",
-    "password":"",
-    "log_level":"INFO",
-    "hass_url":"",
-    "hass_token":""
+        "phone_number": "",
+        "password": "",
+        "log_level": "INFO",
+        "hass_url": "",
+        "hass_token": ""
     }
     pattern = r"--(.*)=(.*)"
-    
+
     for arg in sys.argv[1:]:
-        match_result = re.match(pattern,arg)
+        match_result = re.match(pattern, arg)
         if(None != match_result):
             vars = match_result.groups()
             key = vars[0].lower()
@@ -63,15 +71,18 @@ def argvs_parsor():
 
     for value in args.values():
         if(len(value) == 0):
-            raise Exception("error occured when parsing args. Have you set all required environment variable?")
+            raise Exception(
+                "error occured when parsing args. Have you set all required environment variable?")
     return args
+
 
 def logger_init(level: str):
     logger = logging.getLogger()
     logger.setLevel(level)
     logging.getLogger("urllib3").setLevel(logging.CRITICAL)
-    format = logging.Formatter("%(asctime)s  [%(levelname)-8s] ---- %(message)s","%Y-%m-%d %H:%M:%S")
-    sh = logging.StreamHandler(stream=sys.stdout) 
+    format = logging.Formatter(
+        "%(asctime)s  [%(levelname)-8s] ---- %(message)s", "%Y-%m-%d %H:%M:%S")
+    sh = logging.StreamHandler(stream=sys.stdout)
     sh.setFormatter(format)
     logger.addHandler(sh)
 

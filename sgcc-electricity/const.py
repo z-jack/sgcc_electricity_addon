@@ -5,6 +5,7 @@ BALANCE_URL = "https://www.95598.cn/osgweb/userAcc"
 SUPERVISOR_URL = "http://supervisor/core"
 API_PATH = "/api/states/"
 
+DEBT_SENSOR_NAME = "sensor.electricity_charge_debt"
 BALANCE_SENSOR_NAME = "sensor.electricity_charge_balance"
 DAILY_USAGE_SENSOR_NAME = "sensor.last_electricity_usage"
 YEARLY_USAGE_SENSOR_NAME = "sensor.yearly_electricity_usage"
