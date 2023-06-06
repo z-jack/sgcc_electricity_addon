@@ -29,13 +29,13 @@ def run_task(data_fetcher: DataFetcher, sensor_updator: SensorUpdator):
         for i in range(0, len(user_id_list)):
             profix = f"_{user_id_list[i]}" if len(user_id_list) > 1 else ""
             if(balance_list[i] is not None):
-                sensor_updator.update(BALANCE_SENSOR_NAME + profix, balance_list[i], BALANCE_UNIT)
+                sensor_updator.update(BALANCE_SENSOR_NAME + profix, abs(float(balance_list[i])), BALANCE_UNIT, 'total_increasing')
             if(last_daily_usage_list[i] is not None):
-                sensor_updator.update(DAILY_USAGE_SENSOR_NAME + profix, last_daily_usage_list[i], USAGE_UNIT)
+                sensor_updator.update(DAILY_USAGE_SENSOR_NAME + profix, last_daily_usage_list[i], USAGE_UNIT, 'total_increasing')
             if(yearly_usage_list[i] is not None):
-                sensor_updator.update(YEARLY_USAGE_SENSOR_NAME + profix, yearly_usage_list[i], USAGE_UNIT)
+                sensor_updator.update(YEARLY_USAGE_SENSOR_NAME + profix, yearly_usage_list[i], USAGE_UNIT, 'total_increasing')
             if(yearly_charge_list[i] is not None):
-                sensor_updator.update(YEARLY_CHARGE_SENESOR_NAME + profix, yearly_charge_list[i], BALANCE_UNIT)
+                sensor_updator.update(YEARLY_CHARGE_SENESOR_NAME + profix, yearly_charge_list[i], BALANCE_UNIT, 'total_increasing')
 
         logging.info("state-refresh task run successfully!")
     except Exception as e:
